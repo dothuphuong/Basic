@@ -7,6 +7,13 @@ switch pricingMethod
     case {'Implicit', 'Explicit'}
         nS = modelParams(1);
         nT = modelParams(2);
-        opt = optPriceFD(pricingMethod,UndlData, nS, nT);
+        optStruct = optPriceFD(pricingMethod,UndlData, nS, nT);
+    case 'Binomial'
+        nStep = modelParams;
+        optStruct = optPriceBino(UndlData,nStep);
+    case 'MonteCarlo'
+        nSimul = modelParams;
+        optStruct = optPriceMC(UndlData,nSimul);
 end
+    opt = optStruct.Price;
 end
