@@ -1,5 +1,5 @@
 %Written by: Thu Phuong DO
-%Last modified: 2015-12-23
+%Last modified: 2015-12-27
 %Pricing options by Finite Difference method
 
 function opt = optPriceFD(pricingMethod,UndlData, nS, nT)
@@ -15,7 +15,7 @@ R = UndlData.Rate/100;
 T = UndlData.Maturity;
 sigma = UndlData.sigma/100;
 TypeEx = UndlData.TypeExercise;
-c = UndlData.DividendRate;
+c = UndlData.DividendRate/100;
 
 %Create vector j. By default, Smax = 2*S0
 Smax = 2*S0;
@@ -71,6 +71,8 @@ switch pricingMethod
                        V(row,col) = max(sig*(dS*j(row)-K),v);
                     end
                 end
+            otherwise
+                V = NaN(nS+1,nT+1);
         end
         
     case 'Implicit'
@@ -105,7 +107,10 @@ switch pricingMethod
                     F = flipud(V(2:nS,col+1))+res;
                     V(2:nS,col) = max(flipud(B\F), sig*(dS*j(2:nS)-K));   
                 end
+            otherwise
+                V = NaN(nS+1,nT+1);
         end
 end
-    opt = V(j*dS==S0,1);
+    opt = struct('Price', V(j*dS==S0,1), 'Gridline', V, ...
+                 'S0_vector',j*dS,'T_vector',T:-dt:0);
 end
