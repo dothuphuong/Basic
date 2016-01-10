@@ -15,9 +15,9 @@ sigma = UndlData.sigma/100;
 TypeEx = UndlData.TypeExercise;
 c = UndlData.DividendRate/100;
 
-%Time step precision fixed at 0.001
-dt = 0.001;
-nT = T/dt;
+%Time step precision fixed 
+nT = 1000;
+dt = T/nT;
 
 switch UndlData.Type
     case {'C', 'Call'}
@@ -34,9 +34,10 @@ for i = 1:nSimul
     %Trajectory of underlying for each simulation
     S_t = zeros(nT+1,1);
     S_t(1) = S0;
+    W = randn(nT,1);
     for j=2:(nT+1)
         %Generate normally distributed random variables Wt ~ N(0,t)
-        rnd = randn(1)*sqrt(dt);
+        rnd = W(j-1)*sqrt(dt);
         S_t(j) = S_t(j-1)*exp((R-c-0.5*sigma^2)*dt+sigma*rnd);        
     end
     switch TypeEx

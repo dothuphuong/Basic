@@ -111,6 +111,6 @@ switch pricingMethod
                 V = NaN(nS+1,nT+1);
         end
 end
-    opt = struct('Price', V(j*dS==S0,1), 'Gridline', V, ...
+    opt = struct('Price', V(abs(j*dS-S0)<10e-5,1), 'Gridline', V, ...
                  'S0_vector',j*dS,'T_vector',T:-dt:0);
 end

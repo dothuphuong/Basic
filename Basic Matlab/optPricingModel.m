@@ -1,5 +1,5 @@
 %Written by: Thu Phuong DO
-%Last modified: 2015-12-25
+%Last modified: 2016-01-10
 %Library of option pricing model available
 
 classdef optPricingModel
@@ -7,6 +7,7 @@ classdef optPricingModel
         MonteCarlo,
         Binomial,
         Implicit, %Finite Difference - Implicit method
-        Explicit  %Finite Difference - Explicit method
+        Explicit,  %Finite Difference - Explicit method
+        BlackScholes
     end
 end
