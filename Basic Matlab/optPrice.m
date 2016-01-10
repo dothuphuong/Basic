@@ -9,11 +9,13 @@ switch pricingMethod
         nT = modelParams(2);
         optStruct = optPriceFD(pricingMethod,UndlData, nS, nT);
     case 'Binomial'
-        nStep = modelParams;
+        nStep = modelParams(1);
         optStruct = optPriceBino(UndlData,nStep);
     case 'MonteCarlo'
-        nSimul = modelParams;
+        nSimul = modelParams(1);
         optStruct = optPriceMC(UndlData,nSimul);
+    case 'BlackScholes'
+        optStruct = optPriceBS(UndlData);
 end
     opt = optStruct.Price;
 end
