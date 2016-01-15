@@ -1,8 +1,9 @@
 %Written by: Thu Phuong DO
-%Last modified: 2015-12-27
+%Last modified: 2015-01-16
 %Pricing options by Binomial tree
 
 function opt = optPriceBino(UndlData, nStep)
+%STEP 1 - Extract underlying parameters from the structure
 %INPUTS
 %UndlData: Structure containing basic pricing parameters
 %nStep: number of periods to construct Binomial tree
@@ -31,6 +32,7 @@ d = exp(-sigma * sqrt(dt));
 %Risk-neutral probability
 q = (exp((R-c)*dt)-d)/(u-d);
 
+%STEP 2 - Pricing procedure
 %Underlying Binomial tree
 AssetPrice = zeros(nStep+1,nStep+1);
 AssetPrice(1,1) = S0;
@@ -67,7 +69,21 @@ switch TypeEx
     otherwise
         V = NaN(nStep+1,nStep+1);
 end
-    opt = struct('Price', V(1,1), 'AssetTree', AssetPrice, ...
-                 'OptionTree',V,'T_vector',T:-dt:0);
+
+%STEP 3 - Calculate the greeks of option
+%Calculate delta: delta = (V(1,1)-V(1,0))/(S0*u-S0*d)
+delta = (V(1,2)-V(2,2))/(AssetPrice(1,2)-AssetPrice(2,2));
+%Calculate gamma
+gamma = ((V(1,3)-V(2,3))/(AssetPrice(1,3)-AssetPrice(1,1)) ... 
+        - (V(2,3)-V(3,3))/(AssetPrice(1,1)-AssetPrice(3,3)))/...
+        (0.5*(AssetPrice(1,3)-AssetPrice(3,3)));
+%Calculate theta per trading day
+theta = ((V(2,3) - V(1,1))/(2*dt))/252;
+
+%OUTPUTS
+opt = struct('Price', V(1,1), 'AssetTree', AssetPrice, ...
+             'OptionTree',V,'T_vector',T:-dt:0, ...
+             'Delta', delta, 'Gamma', gamma, ...
+             'Theta', theta);
 end
 
