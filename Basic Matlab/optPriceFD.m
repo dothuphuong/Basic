@@ -1,8 +1,9 @@
 %Written by: Thu Phuong DO
-%Last modified: 2015-12-27
+%Last modified: 2015-11-16
 %Pricing options by Finite Difference method
 
 function opt = optPriceFD(pricingMethod,UndlData, nS, nT)
+%STEP 1 - Extract underlying parameters from the structure
 %INPUTS
 %pricingMethod:Explicit, Implicit
 %UndlData: Structure containing basic pricing parameters
@@ -19,12 +20,20 @@ c = UndlData.DividendRate/100;
 
 %Create vector j. By default, Smax = 2*S0
 Smax = 2*S0;
+
+%Ensure the number of nS vector is even number --> for ease of calculation
+if mod(nS,2)==1
+    nS = nS - 1;
+end
 dS = Smax/nS;
 j = transpose(nS:-1:0);
+%Find the location of S0 in the S0 vector
+loc = nS/2 + 1;
 
 %Compute time step
 dt = T/nT;
 
+%STEP 2 - Pricing procedure
 %Create matrix for final option values
 V = zeros(nS+1,nT+1);
 
@@ -111,6 +120,26 @@ switch pricingMethod
                 V = NaN(nS+1,nT+1);
         end
 end
-    opt = struct('Price', V(abs(j*dS-S0)<10e-5,1), 'Gridline', V, ...
-                 'S0_vector',j*dS,'T_vector',T:-dt:0);
+
+%STEP 3 - Calculate the greeks of option
+%Calculate delta
+    V0 = V(:,1);
+    V_up = V0(loc-1);
+    V_down = V0(loc+1);
+    delta = (V_up - V_down)/(2*dS);
+        
+%Calculate gamma
+    V_mid = V0(loc);
+    gamma = (V_up - 2*V_mid + V_down)/dS^2;
+        
+%Calculate theta per trading day
+    V1 = V(:,2);
+    V_mid_t = V1(loc);
+    theta = ((V_mid_t - V_mid)/dt)/252;
+
+%OUTPUTS 
+    opt = struct('Price', V(loc,1), 'Gridline', V, ...
+                 'S0_vector',j*dS,'T_vector',T:-dt:0, ...
+                 'Delta', delta, 'Gamma', gamma, ...
+                 'Theta', theta);
 end
