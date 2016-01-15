@@ -17,5 +17,6 @@ switch pricingMethod
     case 'BlackScholes'
         optStruct = optPriceBS(UndlData);
 end
-    opt = optStruct.Price;
+    opt = struct('Price',optStruct.Price, 'Delta', optStruct.Delta, ...
+                 'Gamma', optStruct.Gamma, 'Theta', optStruct.Theta);
 end
